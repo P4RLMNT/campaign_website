@@ -1618,6 +1618,43 @@ input, select, textarea {
 
 		}
 
+		#main article#videos {
+			width: 40rem;
+			max-width: 100%;
+			padding: 4.5rem 2.5rem 1.5rem 2.5rem;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+		
+		#main article#videos .video-container {
+			position: relative;
+			width: 100%;
+			padding-bottom: 56.25%; /* 16:9 aspect ratio */
+			margin-bottom: 2rem;
+		}
+		
+		#main article#videos .video-container iframe {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			border: none;
+		}
+		
+		@media screen and (max-width: 736px) {
+			#main article#videos {
+				padding: 3.5rem 2rem 0.5rem 2rem;
+			}
+		}
+		
+		@media screen and (max-width: 480px) {
+			#main article#videos {
+				padding: 3rem 1.5rem 0.5rem 1.5rem;
+			}
+		}
+
 /* Footer */
 
 	#footer {
