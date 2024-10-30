@@ -1,4 +1,9 @@
 (function($) {
+	let gardenSlideIndex = 0;
+	let petsSlideIndex = 0;
+	let gardenInterval;
+	let petsInterval;
+	const SLIDE_INTERVAL = 5000; // 10 seconds
 
 	var	$window = $(window),
 		$body = $('body'),
@@ -23,7 +28,139 @@
 			window.setTimeout(function() {
 				$body.removeClass('is-preload');
 			}, 100);
+			loadSlideshow('garden');
+			loadSlideshow('pets');
 		});
+
+	// Add these functions
+	function loadSlideshow(type) {
+		console.log(`Loading slideshow for ${type}`);
+		
+		// Define image paths
+		const images = {
+			garden: [
+				'/images/garden/20230904_193106.jpg',
+				'/images/garden/20240430_181358.jpg',
+				'/images/garden/20240501_131108.jpg',
+				'/images/garden/20240501_131118.jpg',
+				'/images/garden/20240524_183634.jpg',
+				'/images/garden/20240524_183642.jpg',
+				'/images/garden/20240524_183655.jpg',
+				'/images/garden/20240614_121335.jpg',
+				'/images/garden/20240614_121355.jpg',
+				'/images/garden/20240802_205622.jpg',
+				'/images/garden/20240802_205631.jpg',
+				'/images/garden/20240802_205641.jpg',
+				'/images/garden/20240802_205711.jpg',
+				'/images/garden/20240806_203515.jpg',
+				'/images/garden/Resized_Snapchat-7660473861.jpg'
+			],
+			pets: [
+				'/images/pets/20221022_115416.jpg',
+				'/images/pets/20230304_154904.jpg',
+				'/images/pets/20230328_210719_001.jpg',
+				'/images/pets/20230328_210843.jpg',
+				'/images/pets/20230328_210853.jpg',
+				'/images/pets/20230531_212124.jpg',
+				'/images/pets/20230728_172911.jpg',
+				'/images/pets/20230728_172933.jpg',
+				'/images/pets/20240430_181358.jpg',
+				'/images/pets/20240607_181713.jpg',
+				'/images/pets/received_215722904498584.jpg',
+				'/images/pets/received_695443248940525.jpg',
+				'/images/pets/received_1265326614065229.jpg',
+				'/images/pets/received_1437822390351601.jpg',
+				'/images/pets/received_1507461939737981.jpg',
+				'/images/pets/received_2661513223989501.jpg',
+				'/images/pets/Screenshot_20240918_025716_Messenger.jpg'
+			]
+		};
+		
+		const container = document.querySelector(`.${type}-slideshow .slides-container`);
+		console.log(`Container found:`, container);
+		
+		if (!container) {
+			console.error(`Could not find container for ${type} slideshow`);
+			return;
+		}
+		
+		container.innerHTML = ''; // Clear existing slides
+		
+		images[type].forEach((imagePath, index) => {
+			const slide = document.createElement('div');
+			slide.className = 'slides fade';
+			slide.innerHTML = `<img src="${imagePath}" alt="${type} Image ${index + 1}">`;
+			container.appendChild(slide);
+			console.log(`Added slide ${index + 1} to ${type} slideshow`);
+		});
+		
+		showSlides(0, type); // Show first slide
+		startAutoSlide(type);
+	}
+
+	function startAutoSlide(type) {
+		// Clear existing interval if any
+		if (type === 'garden') {
+			clearInterval(gardenInterval);
+			gardenInterval = setInterval(() => changeSlide(1, 'garden'), SLIDE_INTERVAL);
+		} else {
+			clearInterval(petsInterval);
+			petsInterval = setInterval(() => changeSlide(1, 'pets'), SLIDE_INTERVAL);
+		}
+	}
+
+	function changeSlide(n, type) {
+		// Reset the auto-slide timer when manually changing slides
+		startAutoSlide(type);
+		
+		if (type === 'garden') {
+			showSlides(gardenSlideIndex += n, type);
+		} else {
+			showSlides(petsSlideIndex += n, type);
+		}
+	}
+
+	function showSlides(n, type) {
+		const slides = document.querySelector(`.${type}-slideshow .slides-container`).getElementsByClassName("slides");
+		if (!slides.length) return;
+		
+		if (type === 'garden') {
+			if (n >= slides.length) gardenSlideIndex = 0;
+			if (n < 0) gardenSlideIndex = slides.length - 1;
+			n = gardenSlideIndex;
+		} else {
+			if (n >= slides.length) petsSlideIndex = 0;
+			if (n < 0) petsSlideIndex = slides.length - 1;
+			n = petsSlideIndex;
+		}
+		
+		// Hide all slides
+		for (let i = 0; i < slides.length; i++) {
+			slides[i].style.display = "none";
+		}
+		
+		// Show current slide
+		slides[n].style.display = "block";
+	}
+
+	// Initialize slideshows when the about section is shown
+	$main_articles.filter('#about').on('click', function() {
+		console.log('About section clicked');
+		setTimeout(() => {
+			console.log('Loading slideshows...');
+			loadSlideshow('garden');
+			loadSlideshow('pets');
+		}, 500);
+	});
+
+	// Clean up intervals when leaving the about section
+	$main._hide = (function(original) {
+		return function() {
+			clearInterval(gardenInterval);
+			clearInterval(petsInterval);
+			return original.apply(this, arguments);
+		};
+	})($main._hide);	
 
 	// Fix: Flexbox min-height bug on IE.
 		if (browser.name == 'ie') {
@@ -391,5 +528,7 @@
 					$window.on('load', function() {
 						$main._show(location.hash.substr(1), true);
 					});
+
+		
 
 })(jQuery);
